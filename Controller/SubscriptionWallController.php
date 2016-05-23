@@ -100,28 +100,14 @@ class SubscriptionWallController
     public function createAction()
     {
         $wall = new SubscriptionWall();
-
         $form = $this->createCreateForm($wall);
         $form->handleRequest($this->request);
-
         if ($form->isValid()) {
             $this->em->persist($wall);
-
-            $channels = $form->get('channel')->getData();
-            foreach ($channels as $channel) {
-                $wallChannel = new WallChannel();
-                $wallChannel->setChannel($channel->getId());
-                $wallChannel->setWall($wall);
-                $wallChannel->setSubscriptionWall($wall);
-                $this->em->persist($wallChannel);
-            }
-
             $this->em->flush();
             $this->flashMessage->success('Wall created');
-
             return new RedirectResponse($this->router->generate("integrated_subscription_show_wall"));
         }
-
         return $this->templating->renderResponse('IntegratedSubscriptionBundle:SubscriptionWall:create.html.twig', [
             'form' => $form->createView()
         ]);
@@ -137,7 +123,6 @@ class SubscriptionWallController
             'integrated_subscription_wall',
             $wall,
             [
-                'action' => $this->router->generate('integrated_subscription_create_wall'),
                 'method' => 'POST',
             ]
         );
